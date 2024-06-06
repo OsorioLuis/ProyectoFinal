@@ -8,15 +8,23 @@
         <file>videoJuego/enemigo.png</file>
         <file>videoJuego/izq.png</file>
         <file>videoJuego/muerte.png</file>
-        <file>videoJuego/plaga.png</file>
         <file>videoJuego/proy.png</file>
         <file>videoJuego/proy_abj.png</file>
         <file>videoJuego/proy_arr.png</file>
         <file>videoJuego/proy_der.png</file>
         <file>videoJuego/FondoInicial.jpg</file>
-        <file>videoJuego/enemigo2.png</file>
-        <file>videoJuego/back2.png</file>
         <file>videoJuego/enemigo3.png</file>
         <file>videoJuego/back3.png</file>
+        <file>videoJuego/enemigo2.png</file>
+        <file>videoJuego/back2.png</file>
+        <file>videoJuego/plaga.png</file>
+        <file>videoJuego/fire.png</file>
+        <file>videoJuego/rata.png</file>
+        <file>videoJuego/casa.png</file>
+    </qresource>
+    <qresource prefix="/efectos">
+        <file>sonidos/hurt.wav</file>
+        <file>sonidos/background.mp3</file>
+        <file>sonidos/disparar.wav</file>
     </qresource>
 </RCC>

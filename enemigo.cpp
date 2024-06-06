@@ -1,4 +1,5 @@
 #include "enemigo.h"
+#include "proyectilEnemigo.h"
 #include <QTimer>
 #include <QGraphicsScene>
 #include <QList>
@@ -25,6 +26,17 @@ Enemigo::Enemigo(int nivel, Personaje *objetivo) : QGraphicsPixmapItem(), objeti
     tiempo = new QTimer(this);
     connect(tiempo, &QTimer::timeout, this, &Enemigo::moverEnemigo);
     tiempo->start(25); //modificar este tiempo cambia la velocidad
+
+    if(nivel == 2){
+        tiempoDisparo = new QTimer(this);
+        connect(tiempoDisparo, &QTimer::timeout, this, &Enemigo::disparaProyectil);
+        tiempoDisparo->start(5000); //dispara cada 2 segundos
+    }else if(nivel == 3){
+        tiempoDisparo = new QTimer(this);
+        connect(tiempoDisparo, &QTimer::timeout, this, &Enemigo::disparaProyectil);
+        tiempoDisparo->start(8000); //dispara cada 2 segundos
+    }
+
 
 }
 void Enemigo::moverEnemigo(){
@@ -59,8 +71,15 @@ void Enemigo::recibirImpacto(){
     }else{
         cuentaImpact++;
     }
+}
 
+void Enemigo::disparaProyectil(){
+    if(!objetivo) return; //en caso de que el personaje no esté en escena
 
+    QPointF posInicio = pos();
+    QPointF objetivoPos = objetivo->pos();
+    ProyectilEnemigo *proyectil = new ProyectilEnemigo(posInicio, objetivoPos);
+    scene()->addItem(proyectil); //se añade a la escena
 }
 
 void Enemigo::setTexturas(int nivel){
@@ -76,5 +95,5 @@ void Enemigo::setTexturas(int nivel){
         generico.load(":/Imagenes/videoJuego/enemigo3.png");
         QPixmap scaled_enemigo = generico.scaled(70, 70);
         setPixmap(scaled_enemigo);
-    }
+    }//agregar imagen que diga ganaste el juego y eliminar todos los elementos de la escena y parar todos los timer primero
 }

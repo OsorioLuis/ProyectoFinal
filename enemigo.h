@@ -18,11 +18,13 @@ signals:
     void eliminado();
 private slots:
     void moverEnemigo();
+    void disparaProyectil();
 
 private:
     //miembros de la clase los cuales contienen los punteros de lo que usaremos en los metodos
     Personaje *objetivo;
     QTimer *tiempo;
+    QTimer *tiempoDisparo;
     QPixmap generico;
     QPixmap enemigo2;
 

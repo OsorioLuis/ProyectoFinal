@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/efectos">
+        <file>sonidos/hurt.wav</file>
+    </qresource>
+</RCC>

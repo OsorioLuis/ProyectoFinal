@@ -1,11 +1,16 @@
 #ifndef PERSONAJE_H
 #define PERSONAJE_H
+
 #include <QGraphicsItem>
 #include <QTimer>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsRectItem>
 #include <QObject>
 #include <QVector2D>
+#include <QMediaPlayer>
+#include <QAudioOutput>
+
+class Orbital;
 
 class Personaje: public QObject, public QGraphicsPixmapItem{
     Q_OBJECT //necesario para usar slots
@@ -24,6 +29,10 @@ public:
     //cambio de vida al pasar de nivel
     void setVida();
 
+    //rata
+    void subirNivel();
+    void iniciarOrbital();
+
 public slots:
     void manejoColision();
 
@@ -33,6 +42,7 @@ signals: //de esta forma podemos comunicar cambios de estado a otras partes del 
     void muerte();
     void vidaCambiada(int nuevaVida); //esto se envierá a la clase jeugo para mostrar en pantalla la vida
     void cambioPuntuacion(int nueva);
+    //void nivelCambiado(int nivel); //esta será usada para determinar cuando se necesita el orbital
 
 protected:
     void keyPressEvent(QKeyEvent * event) override;
@@ -52,6 +62,7 @@ private:
     bool derecha = false;
     bool izquierda = false;
     QSet<int> teclas;
+    Orbital *orbital;
 
     int vida; //vida inicial
     int puntuacion;
@@ -63,6 +74,12 @@ private:
     QPixmap abj;
     QPixmap arr;
     QPixmap ataqueImg;
+
+    //sonidos
+    QMediaPlayer *media;
+    QAudioOutput *mediaOut;
+    QMediaPlayer *mediaDis;
+    QAudioOutput *mediaDisOut;
 
 
 };

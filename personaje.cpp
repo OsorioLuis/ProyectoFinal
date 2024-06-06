@@ -1,12 +1,31 @@
 #include "personaje.h"
 #include "Enemigo.h"
+#include "casa.h"
 #include "proyectil.h"
 #include <QGraphicsScene>
 #include <QDebug>
 #include <QKeyEvent>
+#include "orbital.h"
+#include <QMediaPlayer>
+#include <QAudioOutput>
 
-Personaje::Personaje() : vida(10), puntuacion(0){
+Personaje::Personaje() : vida(100), puntuacion(0){
     ataqueImg.load(":/Imagenes/videoJuego/ataque.png");
+
+    //configuracion de sonidos
+    media = new QMediaPlayer(this);
+    mediaOut = new QAudioOutput(this);
+    mediaOut->setVolume(0.5);
+    media->setAudioOutput(mediaOut);
+    media->setSource(QUrl("qrc:/efectos/sonidos/hurt.wav"));
+
+    //para reproduccion simultanea
+
+        mediaDis = new QMediaPlayer(this);
+        mediaDisOut = new QAudioOutput(this);
+        mediaDisOut->setVolume(0.5);
+        mediaDis->setAudioOutput(mediaDisOut);
+        mediaDis->setSource(QUrl("qrc:/efectos/sonidos/disparar.wav"));
 
     //slot para frecuencia de actualizacion de movimiento
     tempo = new QTimer(this);
@@ -29,6 +48,8 @@ Personaje::Personaje() : vida(10), puntuacion(0){
 void Personaje::reducirVida(int cantidad){
     vida -= cantidad;
     emit vidaCambiada(vida);
+    media->play();
+
     if(vida <= 0){
         emit muerte(); //se envía la señal de que personaje murio
         scene()->removeItem(this);
@@ -45,6 +66,7 @@ void Personaje::manejoColision(){
     for(QGraphicsItem *item : itemsColisionados){
         if(typeid(*item) == typeid(Enemigo)){
             reducirVida(1);
+            //sonido de daño
         }
     }
 
@@ -64,7 +86,11 @@ void Personaje::aumentarPuntuacion(int cantidad){
 void Personaje::setVida(){
     vida *= 2;
 }
+void Personaje::iniciarOrbital(){
+        orbital = new Orbital(this);
+        scene()->addItem(orbital);
 
+}
 void Personaje::keyPressEvent(QKeyEvent *event)
 {
     //para la deteccion de la direccion a la que apunta personaje
@@ -89,6 +115,8 @@ void Personaje::keyPressEvent(QKeyEvent *event)
         break;
     }
 
+
+
     //se registra la direccion
     direccion = QPointF(derecha - izquierda, abajo - arriba);
     if (event->key() == Qt::Key_W || event->key() == Qt::Key_S || event->key() == Qt::Key_A || event->key() == Qt::Key_D) {
@@ -104,23 +132,27 @@ void Personaje::keyReleaseEvent(QKeyEvent *event){
     switch(event->key()){
     case Qt::Key_W:
         arriba = false;
-        direccionActual = "W";
+
+
         break;
     case Qt::Key_S:
         abajo = false;
-        direccionActual = "S";
+
+
         break;
     case Qt::Key_A:
         izquierda = false;
-        direccionActual = "A";
+
+
         break;
     case Qt::Key_D:
         derecha = false;
-        direccionActual = "D";
+
         break;
     default:
         break;
     }
+
 
     //se registra la direccion
     direccion = QPointF(derecha - izquierda, abajo - arriba);
@@ -139,9 +171,14 @@ QString Personaje::direccionApuntado(){
 }
 
 void Personaje::disparar(){
+    if(mediaDis->isPlaying()){
+        mediaDis->stop();
+    }
+    mediaDis->play();
     Proyectil *proyectil = new Proyectil(this, direccion);
     //se pasa la direccion donde apunta jugador para determinar que imagen se pone al proyectil
     proyectil->actualizarImagen(direccionActual);
+
     //posicion del proyectil
     proyectil->setPos(x() + pixmap().width() / 4, y() + pixmap().height() / 4);
     scene()->addItem(proyectil);
@@ -175,6 +212,16 @@ void Personaje::actualizarPosicion(){
         movimientoY += 10;
         setPixmap(scaled_abj);
     }
+    //colision con la casa
+    bool colisionaConCasa = false;
+    QList<QGraphicsItem*> colisiones = scene()->items();
+    for (QGraphicsItem *item : colisiones) {
+        Casa *casa = dynamic_cast<Casa*>(item);
+        if (casa) {
+            colisionaConCasa = true;
+            break;
+        }
+    }
 
     //limitar bordes
     //posiciones actuales mas el desplazamiento en pixeles que tuvo
@@ -189,7 +236,7 @@ void Personaje::actualizarPosicion(){
     if(limiteY + pixmap().height() > 900) limiteY = 900 - pixmap().height();
 
     // Actualiza la posición del personaje
-    if (movimientoX != 0 || movimientoY != 0) {
+    if ((movimientoX != 0 || movimientoY != 0) || !colisionaConCasa) {
         setPos(limiteX, limiteY);
     }
 }

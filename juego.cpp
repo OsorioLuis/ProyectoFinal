@@ -1,12 +1,16 @@
 #include "juego.h"
+#include "casa.h"
 #include "ui_juego.h"
 #include "enemigo.h"
 #include <QVBoxLayout>
+#include <QRandomGenerator>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 
 Juego::Juego(QWidget *parent)
     : QGraphicsView(parent)
     , ui(new Ui::Juego)
-    , puntuacionObjetivo(5)
+    , puntuacionObjetivo(10)
 {
     ui->setupUi(this);
     escena = new QGraphicsScene();
@@ -24,6 +28,16 @@ Juego::Juego(QWidget *parent)
     ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     establecerNivel(1);
+    //configuracion de musica de fondo
+    backsound = new QMediaPlayer(this);
+    audioOut = new QAudioOutput(this);
+
+    backsound->setAudioOutput(audioOut);
+    backsound->setSource(QUrl("qrc:/efectos/sonidos/background.mp3"));
+    backsound->setLoops(QMediaPlayer::Infinite);
+    audioOut->setVolume(0.5);
+    backsound->play();
+
     //imagen muerte
     muerte = new QGraphicsPixmapItem;
     QPixmap imagen(":/Imagenes/videoJuego/muerte.png");
@@ -40,6 +54,15 @@ Juego::Juego(QWidget *parent)
     //creacion textos
     vidaTexto = new QGraphicsTextItem();
     nivelJuego = new QGraphicsTextItem();
+    objetivo = new QGraphicsTextItem();
+
+    //puntuacion objetivo
+    objetivo->setPlainText(QString("Objetivo: %1").arg(puntuacionObjetivo));
+
+
+    objetivo->setDefaultTextColor(Qt::white);
+    objetivo->setFont(QFont("times", 24));
+    objetivo->setPos(700, 820);
 
     //nivel
     nivelJuego->setPlainText(QString("Nivel: %1").arg(nivelActual));
@@ -61,16 +84,11 @@ Juego::Juego(QWidget *parent)
     ptsJugador->setPos(160, 55);
 
     //mensaje puntuacion objetivo lograda
-    mensajeNivel = new QGraphicsTextItem();
-    mensajeNivel->setDefaultTextColor(Qt::yellow);
-    mensajeNivel->setFont(QFont("Arial", 24));
-    mensajeNivel->setPos(600, 400);
-    mensajeNivel->setVisible(false);  // Inicialmente no visible
-    escena->addItem(mensajeNivel);
 
     escena->addItem(ptsJugador);
     escena->addItem(nivelJuego);
     escena->addItem(vidaTexto);
+    escena->addItem(objetivo);
 
     //slots para cambio de vida
     //hacemos la conexion entre la señal vidaCambiada y actualizarVida
@@ -120,15 +138,16 @@ void Juego::verificarPuntuacion(){
     if (personaje->getPuntacion() >= puntuacionObjetivo) {
         nivelActual++;
         puntuacionObjetivo *= 5;
+        objetivo->setPlainText(QString("Objetivo: %1").arg(puntuacionObjetivo));
         nivelJuego->setPlainText(QString("Nivel: %1").arg(nivelActual));
 
-        mensajeNivel->setPlainText(QString("Has pasado al nivel %1").arg(nivelActual));
-        mensajeNivel->setVisible(true);
+        // mensajeNivel->setPlainText(QString("Has pasado al nivel %1").arg(nivelActual));
+        // mensajeNivel->setVisible(true);
 
-        //temporizador para ocultar mensaje luego de 2 segundos
-        QTimer::singleShot(3000, [this](){
-            mensajeNivel->setVisible(false);
-        });
+        // //temporizador para ocultar mensaje luego de 2 segundos
+        // QTimer::singleShot(3000, [this](){
+        //     mensajeNivel->setVisible(false);
+        // });
 
         //ventana para la seleccion de arma
         mostrarSeleccionArma();        
@@ -153,6 +172,22 @@ void Juego::setBack(int nivel){
     }
 
 
+}
+
+void Juego::agregarCasas(int cantidad){
+    for(int i = 0; i < cantidad; i++){
+        int posx = QRandomGenerator::global()->bounded(1600);
+        int posy = QRandomGenerator::global()->bounded(900);
+
+        Casa *casa = new Casa();
+        if(posx >= 800 && posy >= 450){
+            casa->setPos(posx / 2, posy / 2);
+            escena->addItem(casa);
+        }
+
+        //añadimos la casa a la lista, de las casas que serán dañadas
+        casas.append(casa);
+    }
 }
 
 void Juego::actualizarPuntuacion(int nuevaPts){
@@ -191,11 +226,19 @@ void Juego::mostrarSeleccionArma(){
 void Juego::iniciarNivel(){
     if(nivelActual == 2){
         seleccionarma->hide();
-        actualizarNivel(600);
+        actualizarNivel(700);
         setBack(nivelActual);
+        //ahora ponemos el orbital al jugador
+
+        personaje->iniciarOrbital();
+
     }else if(nivelActual == 3){
+        //añadimos casas y orbital
+        personaje->iniciarOrbital();
+        agregarCasas(10);
+
         seleccionarma->hide();
-        actualizarNivel(400);
+        actualizarNivel(600);
         setBack(nivelActual);
     }
 }
