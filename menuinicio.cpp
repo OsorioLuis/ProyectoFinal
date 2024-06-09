@@ -1,5 +1,6 @@
 #include "menuinicio.h"
 #include "ui_menuinicio.h"
+#include "menujuego.h"
 
 QString usu, pass;
 vector<string> datos;

@@ -16,6 +16,7 @@ SOURCES += \
     menuinicio.cpp \
     menujuego.cpp \
     orbital.cpp \
+    pantallafin.cpp \
     personaje.cpp \
     proyectil.cpp \
     proyectilEnemigo.cpp \
@@ -29,6 +30,7 @@ HEADERS += \
     menuinicio.h \
     menujuego.h \
     orbital.h \
+    pantallafin.h \
     personaje.h \
     proyectil.h \
     proyectilEnemigo.h \
@@ -39,7 +41,8 @@ FORMS += \
     SeleccionArma.ui \
     juego.ui \
     menuinicio.ui \
-    menujuego.ui
+    menujuego.ui \
+    pantallafin.ui
 
 
 # Default rules for deployment.

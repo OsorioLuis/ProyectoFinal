@@ -84,12 +84,41 @@ void Personaje::aumentarPuntuacion(int cantidad){
 }
 
 void Personaje::setVida(){
-    vida *= 2;
+    vida += 10;
 }
 void Personaje::iniciarOrbital(){
         orbital = new Orbital(this);
         scene()->addItem(orbital);
 
+}
+
+void Personaje::colisionesCasas(){
+    QList<QGraphicsItem*> itemsCol = collidingItems();
+    for(QGraphicsItem * item : itemsCol){
+        if(typeid(*item) == typeid(Casa)){
+            Casa *casa = dynamic_cast<Casa*>(item);
+            if(casa){
+
+                //hay rebotes simples, se invierte movimiento
+                //modificamos la posicon en x e y y luego actualizamos la posicion
+                if(teclas.contains(Qt::Key_Left)){
+                    setX(pos().x() + 20);
+                    setPos(x() + 20, y());
+
+                } else if (teclas.contains(Qt::Key_Right)) {
+                    setX(pos().x() - 20);
+                    setPos(x() - 20, y());
+                }
+                if (teclas.contains(Qt::Key_Up)) {
+                    setY(pos().y() + 20);
+                    setPos(x(), y() + 20);
+                } else if (teclas.contains(Qt::Key_Down)) {
+                    setY(pos().y() - 20);
+                    setPos(x(), y() - 20);
+                }
+            }
+        }
+    }
 }
 void Personaje::keyPressEvent(QKeyEvent *event)
 {
@@ -212,16 +241,7 @@ void Personaje::actualizarPosicion(){
         movimientoY += 10;
         setPixmap(scaled_abj);
     }
-    //colision con la casa
-    bool colisionaConCasa = false;
-    QList<QGraphicsItem*> colisiones = scene()->items();
-    for (QGraphicsItem *item : colisiones) {
-        Casa *casa = dynamic_cast<Casa*>(item);
-        if (casa) {
-            colisionaConCasa = true;
-            break;
-        }
-    }
+
 
     //limitar bordes
     //posiciones actuales mas el desplazamiento en pixeles que tuvo
@@ -236,9 +256,11 @@ void Personaje::actualizarPosicion(){
     if(limiteY + pixmap().height() > 900) limiteY = 900 - pixmap().height();
 
     // Actualiza la posición del personaje
-    if ((movimientoX != 0 || movimientoY != 0) || !colisionaConCasa) {
+    if ((movimientoX != 0 || movimientoY != 0)) {
         setPos(limiteX, limiteY);
     }
+    //manejar colisiones con casas
+    colisionesCasas();
 }
 
 

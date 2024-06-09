@@ -8,7 +8,7 @@
 class Casa : public QObject, public QGraphicsPixmapItem {
     Q_OBJECT
 public:
-    Casa(QGraphicsItem *parent = nullptr); //es un objeto por si mismo
+    Casa(int x, int y,QGraphicsItem *parent = nullptr); //es un objeto por si mismo
     void recibirImpacto(); //esta será la encaergada de manejra las señales que se envian
 
 signals:

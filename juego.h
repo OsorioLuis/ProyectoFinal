@@ -19,6 +19,7 @@
 #include <QObject>
 #include <QMediaPlayer>
 #include <QAudioOutput>
+#include "pantallafin.h"
 
 namespace Ui {
 class Juego;
@@ -39,7 +40,8 @@ public:
 
     //background
     void setBack(int nivel);
-    void agregarCasas(int cantidad);
+
+    void agregarCasas();
 private slots:
     void crearEnemigo();
     void actualizarVida(int nuevaVida);
@@ -48,6 +50,7 @@ private slots:
 
     //subida de nivel (cambio de escena
     void mostrarSeleccionArma();
+    void mostrarPantallaFinal();
     void iniciarNivel();
 
 private:
@@ -55,6 +58,7 @@ private:
     QGraphicsScene * escena;
     Personaje * personaje;
     SeleccionArma *seleccionarma;
+    PantallaFin *pantallafinal;
     QTimer *tiempo;
     QTimer *enemigoTiempo;
     QGraphicsTextItem *vidaTexto;
@@ -75,7 +79,7 @@ private:
     void limpiarNivel();
 
     //lista de casas que hay esto para manejar cual recibe impacto
-    QList<Casa*> casas;
+    //QList<Casa*> casas;
 
     //musica de fondo
     QMediaPlayer *backsound;

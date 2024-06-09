@@ -37,6 +37,5 @@ private:
     Ui::MenuInicio *ui;
 };
 
-#include "menujuego.h"
 
 #endif // MENUINICIO_H

@@ -1,5 +1,6 @@
 #include "juego.h"
 #include "casa.h"
+#include <QLabel>
 #include "ui_juego.h"
 #include "enemigo.h"
 #include <QVBoxLayout>
@@ -10,7 +11,7 @@
 Juego::Juego(QWidget *parent)
     : QGraphicsView(parent)
     , ui(new Ui::Juego)
-    , puntuacionObjetivo(10)
+    , puntuacionObjetivo(1)
 {
     ui->setupUi(this);
     escena = new QGraphicsScene();
@@ -21,6 +22,7 @@ Juego::Juego(QWidget *parent)
     setSceneRect(0,0, 1600, 900);
     //setScene(escena);
 
+    ui->graphicsView->setScene(escena);
     ui->graphicsView->setScene(escena);
     ui->graphicsView->setFixedSize(1600, 900);
     ui->graphicsView->setSceneRect(0,0, 1600, 900);
@@ -35,7 +37,7 @@ Juego::Juego(QWidget *parent)
     backsound->setAudioOutput(audioOut);
     backsound->setSource(QUrl("qrc:/efectos/sonidos/background.mp3"));
     backsound->setLoops(QMediaPlayer::Infinite);
-    audioOut->setVolume(0.5);
+    audioOut->setVolume(0.4);
     backsound->play();
 
     //imagen muerte
@@ -126,6 +128,9 @@ Juego::Juego(QWidget *parent)
     seleccionarma = new SeleccionArma();
     connect(seleccionarma, &SeleccionArma::iniciarNivel, this, &Juego::iniciarNivel);
 
+    //pantalla de fin de juego
+    pantallafinal = new PantallaFin();
+
 }
 
 Juego::~Juego()
@@ -135,6 +140,7 @@ Juego::~Juego()
 
 
 void Juego::verificarPuntuacion(){
+
     if (personaje->getPuntacion() >= puntuacionObjetivo) {
         nivelActual++;
         puntuacionObjetivo *= 5;
@@ -149,15 +155,21 @@ void Juego::verificarPuntuacion(){
         //     mensajeNivel->setVisible(false);
         // });
 
-        //ventana para la seleccion de arma
-        mostrarSeleccionArma();        
-
+        if(personaje->getPuntacion() == 25){
+            close();
+            mostrarPantallaFinal();
+        }else{
+            //ventana para la seleccion de arma
+            mostrarSeleccionArma();
+        }
     }
+
 }
 
 void Juego::establecerNivel(int nivel){
     nivelActual = nivel;
 }
+
 
 void Juego::setBack(int nivel){
     if(nivel == 1){
@@ -174,20 +186,30 @@ void Juego::setBack(int nivel){
 
 }
 
-void Juego::agregarCasas(int cantidad){
-    for(int i = 0; i < cantidad; i++){
-        int posx = QRandomGenerator::global()->bounded(1600);
-        int posy = QRandomGenerator::global()->bounded(900);
+void Juego::agregarCasas(){
 
-        Casa *casa = new Casa();
-        if(posx >= 800 && posy >= 450){
-            casa->setPos(posx / 2, posy / 2);
-            escena->addItem(casa);
-        }
+    Casa *casa1 = new Casa(200, 200);
+    escena->addItem(casa1);
+    Casa *casa2 = new Casa(1200, 200);
+    escena->addItem(casa2);
+    Casa *casa3 = new Casa(200, 600);
+    escena->addItem(casa3);
+    Casa *casa4 = new Casa(1200, 600);
+    escena->addItem(casa4);
 
-        //añadimos la casa a la lista, de las casas que serán dañadas
-        casas.append(casa);
-    }
+    // for(int i = 0; i < cantidad; i++){
+    //     int posx = QRandomGenerator::global()->bounded(1600);
+    //     int posy = QRandomGenerator::global()->bounded(900);
+
+    //     Casa *casa = new Casa();
+    //     if(posx >= 800 && posy >= 450){
+    //         casa->setPos(posx / 2, posy / 2);
+    //         escena->addItem(casa);
+    //     }
+
+    //     //añadimos la casa a la lista, de las casas que serán dañadas
+    //     casas.append(casa);
+    // }
 }
 
 void Juego::actualizarPuntuacion(int nuevaPts){
@@ -235,12 +257,18 @@ void Juego::iniciarNivel(){
     }else if(nivelActual == 3){
         //añadimos casas y orbital
         personaje->iniciarOrbital();
-        agregarCasas(10);
+        agregarCasas();
 
         seleccionarma->hide();
         actualizarNivel(600);
         setBack(nivelActual);
+    }else{
+        escena->clear();
     }
+}
+void Juego::mostrarPantallaFinal(){
+    escena->removeItem(personaje);
+    pantallafinal->show();
 }
 
 void Juego::actualizarNivel(int time){

@@ -21,6 +21,7 @@
         <file>videoJuego/fire.png</file>
         <file>videoJuego/rata.png</file>
         <file>videoJuego/casa.png</file>
+        <file>videoJuego/fin.png</file>
     </qresource>
     <qresource prefix="/efectos">
         <file>sonidos/hurt.wav</file>

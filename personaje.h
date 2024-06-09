@@ -33,6 +33,9 @@ public:
     void subirNivel();
     void iniciarOrbital();
 
+    //manejar colisiones con casas
+    void colisionesCasas();
+
 public slots:
     void manejoColision();
 
